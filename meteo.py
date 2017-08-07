@@ -18,9 +18,9 @@ def get_data():
         temperature = a.split('>')[-1]
         data[i] = temperature +'°C '+ temps
 
-    return '%0A'.join(data)
+    return '%0A'.join(data) #%0A saut de ligne
 
 def send_payload(data):
-    req.open(api+data) #%0A saut de ligne
+    req.open(api+data)
 
 send_payload(get_data())
