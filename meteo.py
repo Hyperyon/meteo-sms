@@ -1,47 +1,26 @@
 #!/usr/bin/python
 print "Content-type: text/html\n\n"
 # -*- coding:Utf-8 -*-
-import urllib2
 
+import urllib2 as get
 
-url = "http://paris.lachainemeteo.com/meteo-france/ville/previsions-meteo-paris-3903-0.php"
-data=urllib2.urlopen(url)
-data = data.read()
+api = "https://smsapi.free-mobile.fr/sendmsg?user=1023xxx&pass=mySuperPass&msg="
+site = 'http://paris.lachainemeteo.com/meteo-france/ville/previsions-meteo-paris-3903-0.php'
+req = get.build_opener()
 
-start_parse = '<div class="tempe '
-end_parse = '<div class="separateur"><!-- --></div>'
-temperature, pictogramme = [], []
+def get_data():
+    data = req.open(site).read()
+    data = data.split('<img infoPrincipale="1" alt="')[1:4]
 
-temp_data = [item.split(end_parse) for item in data.split(start_parse)[1:]]
+    for i, element in enumerate(data):
+        a = element.split('&deg</div>')[0]
+        temps = a.split('"')[0]
+        temperature = a.split('>')[-1]
+        data[i] = temperature +'°C '+ temps
 
-start_parse = '<div class="picto">'
-end_parse = '" />'
-pict_data = [a for a in [item.split(end_parse) for item in data.split(start_parse)]]
+    return '%0A'.join(data)
 
-pictogramme = [ pic.split('.png')[0] for pic in [item[0].split('/')[-1] for item in pict_data] ][1:16]
+def send_payload(data):
+    req.open(api+data) #%0A saut de ligne
 
-effet = []
-for a in pictogramme:
-    if a[0] == 'c':
-        if '0000' in a:
-            effet.append('soleil : ')
-        else:
-            effet.append('nuage : ')
-
-    if a[0] == 'x' or a[0] == 'p':
-        effet.append('pluie : ')
-
-
-print pictogramme
-print len(pictogramme)
-
-for item in temp_data:
-    temperature.append([temp.split('>')[-1] for temp in item[0].split('&deg;')[:2]])
-
-data = [(a+b[0]+'/'+b[1]).replace(' ','%20') for a,b in zip(effet, temperature)][:7]
-
-data = '%0a'.join(data)
-print data
-
-me = 'https://smsapi.free-mobile.fr/sendmsg?user=1023xxx&pass=mySuperPass&msg='
-data = me+data
+send_payload(get_data())
