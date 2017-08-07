@@ -1,6 +1,7 @@
 #!/usr/bin/python
-print "Content-type: text/html\n\n"
 # -*- coding:Utf-8 -*-
+print "Content-type: text/html\n\n"
+
 import urllib2 as get
 
 api = "https://smsapi.free-mobile.fr/sendmsg?user=1023xxx&pass=mySuperPass&msg="
